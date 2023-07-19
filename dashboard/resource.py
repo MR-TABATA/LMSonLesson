@@ -3,6 +3,7 @@ from chapter.models import ElmsChapter
 from lesson.models import ElmsLesson, ElmsLessonUserShip
 from notification.models import ElmsNotification
 from course.models import ElmsCourse
+from query.models import ElmsQuery
 
 from import_export.resources import ModelResource
 from import_export.admin import ImportExportModelAdmin
@@ -37,6 +38,12 @@ class ElmsNotificationResource(ModelResource):
   class Meta:
     model = ElmsNotification
     fields = ('id', 'title', 'content', 'elms_user', )
+
+class ElmsQueryResource(ModelResource):
+  class Meta:
+    model = ElmsQuery
+    fields = ('id', 'mail', 'content',)
+
 
 class MyUserResource(ModelResource):
   def before_import_row(self, row, **kwargs):

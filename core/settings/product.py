@@ -17,13 +17,13 @@ from .base import *
 SECRET_KEY = get_random_secret_key()
 
 
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }  
+    }
 }
 
 LOG_BASE_DIR = os.path.join("/var", "www", "logs")

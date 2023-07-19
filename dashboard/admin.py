@@ -9,6 +9,7 @@ from django.db import models
 from accounts.models import CustomUser
 from chapter.models import ElmsChapter
 from lesson.models import ElmsLesson, ElmsLessonUserShip
+from query.models import ElmsQuery
 from notification.models import ElmsNotification
 from course.models import ElmsCourse
 
@@ -22,6 +23,7 @@ from dashboard.resource import (
   ElmsLessonResource,
   ElmsLessonUserShipResource,
   ElmsNotificationResource,
+  ElmsQueryResource,
 )
 
 from django.contrib.auth.hashers import make_password
@@ -64,9 +66,9 @@ class MyUserAdmin(ImportExportModelAdmin, UserAdmin):
   ordering = ('id',)
   resource_class = MyUserResource
 
-  def delete(self):
-    self.deleted = timezone.now()
-    self.save()
+  def delete_model(self, request, obj):
+    obj.deleted = timezone.now()
+    obj.save()
 
   def get_queryset(self, request):
     queryset = super().get_queryset(request)
@@ -94,9 +96,9 @@ class ElmsCourseAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     models.TextField: {'widget': Textarea(attrs={'rows': 10, 'cols': 80})},
   }
 
-  def delete(self):
-    self.deleted = timezone.now()
-    self.save()
+  def delete_model(self, request, obj):
+    obj.deleted = timezone.now()
+    obj.save()
 
   def get_queryset(self, request):
     queryset = super().get_queryset(request)
@@ -126,14 +128,14 @@ class ElmsChapterAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     return obj.elms_chapter_course.title
   elms_course_title.short_description = 'コース名'
 
-  def delete(self):
-    self.deleted = timezone.now()
-    self.save()
+  def delete_model(self, request, obj):
+    obj.deleted = timezone.now()
+    obj.save()
 
   def get_queryset(self, request):
     queryset = super().get_queryset(request)
     return queryset.filter(deleted__isnull=True).all()
-    
+
   def delete_queryset(self, request, queryset):
     for obj in queryset:
       obj.deleted = timezone.now()
@@ -159,9 +161,9 @@ class ElmsLessonAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     models.TextField: {'widget': Textarea(attrs={'rows': 10, 'cols': 80})},
   }
 
-  def delete(self):
-    self.deleted = timezone.now()
-    self.save()
+  def delete_model(self, request, obj):
+    obj.deleted = timezone.now()
+    obj.save()
 
   def get_queryset(self, request):
     queryset = super().get_queryset(request)
@@ -171,7 +173,7 @@ class ElmsLessonAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     for obj in queryset:
       obj.deleted = timezone.now()
       obj.save()
-      
+
 class ElmsNotificationAdmin(ImportExportModelAdmin, admin.ModelAdmin):
   list_display = ('id', 'target', 'title', )
   list_display_links = ('title',)
@@ -186,9 +188,36 @@ class ElmsNotificationAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     models.TextField: {'widget': Textarea(attrs={'rows': 50, 'cols': 80})},
   }
 
-  def delete(self):
-    self.deleted = timezone.now()
-    self.save()
+  def delete_model(self, request, obj):
+    obj.deleted = timezone.now()
+    obj.save()
+
+  def get_queryset(self, request):
+    queryset = super().get_queryset(request)
+    return queryset.filter(deleted__isnull=True).all()
+
+  def delete_queryset(self, request, queryset):
+    for obj in queryset:
+      obj.deleted = timezone.now()
+      obj.save()
+
+class ElmsQueryAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+  list_display = ('id', 'mail', )
+  list_display_links = ('mail',)
+  fieldsets = (
+    (None, {'fields': ('mail', 'content', 'created', 'modified', 'deleted', )}),
+  )
+  readonly_fields = ['mail', 'content', 'created', 'modified', 'deleted', ]
+  resource_class = ElmsQueryResource
+  formats = [base_formats.CSV]
+  formfield_overrides = {
+    models.CharField: {'widget': TextInput(attrs={'size': '80'})},
+    models.TextField: {'widget': Textarea(attrs={'rows': 50, 'cols': 80})},
+  }
+
+  def delete_model(self, request, obj):
+    obj.deleted = timezone.now()
+    obj.save()
 
   def get_queryset(self, request):
     queryset = super().get_queryset(request)
@@ -238,5 +267,6 @@ admin.site.register(ElmsChapter, ElmsChapterAdmin)
 admin.site.register(ElmsCourse, ElmsCourseAdmin)
 admin.site.register(ElmsLesson, ElmsLessonAdmin)
 admin.site.register(ElmsNotification, ElmsNotificationAdmin)
+admin.site.register(ElmsQuery, ElmsQueryAdmin)
 admin.site.register(ElmsLessonUserShip, ElmsLessonUserShipAdmin)
 

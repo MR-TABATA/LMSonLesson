@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'dashboard.apps.DashboardConfig',
     'lesson.apps.LessonConfig',
     'home.apps.HomeConfig',
+    'query.apps.QueryConfig',
     'notification.apps.NotificationConfig',
     'situation.apps.SituationConfig',
 ]
